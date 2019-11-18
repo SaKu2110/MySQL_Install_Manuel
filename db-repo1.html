@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+       <meta charset="UTF-8">
+       <link href="./lib/css/md.css" rel="stylesheet"></link>
+   </head>
+    <body>
+        <div id="container">
+        </div>
+        <script src="./lib/js/jquery.min.js"></script>
+        <script src="./lib/js/marked.min.js"></script>
+        <script>
+var markdown = (function() {/*
+
+# MySQLインストールマニュアル
+## 概要
+CentOSにMySQLをインストールする.
+## 実行環境
+
+**PC:** MacBook Pro (13-inch, 2018, Four Thunderbolt 3 Ports)  
+**OS:** macOS Catalina v10.15.1 　
+
+**ゲストOS:** CentOS 7
+## インストール対象
+MySQL v8.10
+## 使用したツール
+- VirtualBox v6.0.10  
+- Vagrant v2.2.5  
+
+Winユーザーのみ
+- git for windows
+
+### ツールの説明
+- ### VirtualBox
+
+ホストOSの上にOSを起動して制御することができるVMを作成するためのツール.  
+[公式サイト](https://www.virtualbox.org/)からインストールできる.  
+
+- ### Vagrant
+
+VirtualBoxの諸々の設定をVagrantfileと呼ばれるファイルを元に自動で設定してくれるツール.  
+Ruby製（ソースコード: [hashicorp/vagrant](https://github.com/hashicorp/vagrant)）.  
+<br>[公式サイト](https://www.vagrantup.com/downloads.html)からインストールできる.
+
+- ### git for windows
+
+Windowsでbashが扱える便利なツール.  
+[公式サイト](https://github.com/git-for-windows/git/releases/tag/v2.24.0.windows.2)からインストールできる.  
+
+## Linux環境を作成する
+Vagrantを用いてLinux環境を作成したいと思います.  
+OSのディストリビューションは`CentOS 7`にしました.  
+ターミナル （または, git for windows）を開いて以下のコマンドを実行します.  
+```
+$ mkdir centos_7
+$ cd cemtos_7
+$ vagrant init
+```
+`ls -la`で`Vagrantfile`なるものが作成されているか確認します.  
+
+それではVagrantfileを以下のように編集します.  
+```ruby:Vagrantfile
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+vmName = "centos" # 作成するVMの名前
+vmImage = "centos/7" # VMに使用するイメージ
+userName = "b1018106" # ユーザー名
+
+Vagrant.configure("2") do |config|
+  config.vm.define "#{vmName}" do |o|
+    o.vm.box = vmImage
+    o.vm.hostname = userName
+  end
+end
+```
+以下のコマンドでVMを作成します.  
+```
+$ vagrant up
+```
+処理が終わったら実際に作成されているのか確認してみます.  
+```
+$ vagrant status
+Current machine states:
+
+centos                    running (virtualbox)
+
+The VM is running. To stop this VM, you can run `vagrant halt` to
+shut it down forcefully, or you can run `vagrant suspend` to simply
+suspend the virtual machine. In either case, to restart it again,
+simply run `vagrant up`.
+```
+`running`になっていればVMが動いていることになります.  
+これで`CentOS 7`の環境が作成されました.  
+## CentOSにログインする
+それでは, 以下のコマンドで`CentOS 7`にログインしたいと思います  
+```
+$ vagrant ssh
+```
+実際にログインできたか確認してみます.  
+以下のコマンドを実行してみます.  
+```
+$ cat /etc/redhat-release
+CentOS Linux release 7.6.1810 (Core) 
+```
+## MySQLをインストールする
+それでは, CentOSにMySQLをインストールしていこうと思います.   
+今回は, rpmパッケージを利用して, MySQLをインストールします.  
+rpmパッケージは[MySQL公式サイト](https://dev.mysql.com/downloads/repo/yum/)から探してきます.  
+```
+$ rpm -ivh https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+```
+次に, yumリポジトリを更新して, MySQLをインストールします.
+```
+$ yum update -y
+$ yum install -y mysql-community-devel
+$ yum install -y mysql-community-server
+```
+実際にMySQLが動いているのか確認します.  
+以下のように(｀Active: active (running)｀に)なっていればインストール完了です.  
+```
+$ sudo systemctl status mysqld.service
+● mysqld.service - MySQL Server
+   Loaded: loaded (/usr/lib/systemd/system/mysqld.service; enabled; vendor preset: disabled)
+   Active: active (running) since 月 2019-11-18 02:59:56 UTC; 1min 3s ago
+     Docs: man:mysqld(8)
+           http://dev.mysql.com/doc/refman/en/using-systemd.html
+ Main PID: 15979 (mysqld)
+   Status: "Server is operational"
+   CGroup: /system.slice/mysqld.service
+           └─15979 /usr/sbin/mysqld
+
+11月 18 02:59:48 linux-user systemd[1]: Starting MySQL Server...
+11月 18 02:59:56 linux-user systemd[1]: Started MySQL Server.
+```
+*/}).toString().match(/\/\*([^]*)\*\//)[1];
+           var md = marked(markdown);
+           $("#container").append(md);
+       </script>
+    </body>
+</html>
