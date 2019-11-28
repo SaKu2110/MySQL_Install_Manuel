@@ -12,7 +12,7 @@
         <script>
 var markdown = (function() {/*
 
-# MySQLインストールマニュアル
+# LinuxへのMySQLインストールマニュアル
 ## 概要
 CentOSにMySQLをインストールする.
 ## 実行環境
@@ -38,13 +38,13 @@ Winユーザーのみ
 
 - ### Vagrant
 
-VirtualBoxの諸々の設定をVagrantfileと呼ばれるファイルを元に自動で設定してくれるツール.  
+VirtualBoxの諸々の設定をVagrantfileと呼ばれるファイルを元に自動化できるツール.  
 Ruby製（ソースコード: [hashicorp/vagrant](https://github.com/hashicorp/vagrant)）.  
-<br>[公式サイト](https://www.vagrantup.com/downloads.html)からインストールできる.
+[公式サイト](https://www.vagrantup.com/downloads.html)からインストールできる.
 
 - ### git for windows
 
-Windowsでbashが扱える便利なツール.  
+Windowsでbashが扱えるツール.  
 [公式サイト](https://github.com/git-for-windows/git/releases/tag/v2.24.0.windows.2)からインストールできる.  
 
 ## Linux環境を作成する
@@ -78,7 +78,7 @@ end
 ```
 $ vagrant up
 ```
-処理が終わったら実際に作成されているのか確認してみます.  
+処理が終わったら実際に作成されているのか確認します.  
 ```
 $ vagrant status
 Current machine states:
@@ -93,20 +93,22 @@ simply run `vagrant up`.
 `running`になっていればVMが動いていることになります.  
 これで`CentOS 7`の環境が作成されました.  
 ## CentOSにログインする
-それでは, 以下のコマンドで`CentOS 7`にログインしたいと思います  
+以下のコマンドで`CentOS 7`にログインします.  
 ```
 $ vagrant ssh
 ```
-実際にログインできたか確認してみます.  
-以下のコマンドを実行してみます.  
+実際にログインできたか確認します.  
+以下のコマンドを実行します.  
 ```
 $ cat /etc/redhat-release
 CentOS Linux release 7.6.1810 (Core) 
 ```
 ## MySQLをインストールする
-それでは, CentOSにMySQLをインストールしていこうと思います.   
-今回は, rpmパッケージを利用して, MySQLをインストールします.  
+CentOSにMySQLをインストールします.   
+初期状態のyumコマンドではMySQLをインストールできないのでrpmパッケージを利用して,  
+MySQLをインストールします.  
 rpmパッケージは[MySQL公式サイト](https://dev.mysql.com/downloads/repo/yum/)から探してきます.  
+以下のコマンドでMySQLのrpmパッケージを追加します.
 ```
 $ rpm -ivh https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
 ```
@@ -116,8 +118,8 @@ $ yum update -y
 $ yum install -y mysql-community-devel
 $ yum install -y mysql-community-server
 ```
-実際にMySQLが動いているのか確認します.  
-以下のように(｀Active: active (running)｀に)なっていればインストール完了です.  
+以下のコマンドを実行してMySQLが動いているのか確認します.  
+以下のよう(｀Active: active (running)｀)になっていればMySQLが動いています.  
 ```
 $ sudo systemctl status mysqld.service
 ● mysqld.service - MySQL Server
@@ -132,6 +134,58 @@ $ sudo systemctl status mysqld.service
 
 11月 18 02:59:48 linux-user systemd[1]: Starting MySQL Server...
 11月 18 02:59:56 linux-user systemd[1]: Started MySQL Server.
+```
+## MySQLの初期化を行う
+MySQLのrootユーザにパスワードが設定されているので, 初期化が行えません.
+```
+$ sudo mysqld  --initialize-insecure
+$ sudo mysql_secure_installation
+
+Securing the MySQL server deployment.
+
+Enter password for user root: 
+Error: Access denied for user 'root'@'localhost' (using password: YES)
+```
+そこで, rootユーザのパスワードを再設定します.  
+以下のコマンドで, MySQLのパスワードを利用しないでログインできるようにします.  
+`/etc/my.conf`に以下の記述を加えます.  
+```
+[mysqld]
+  ・
+  ・
+<省略>
+  ・
+  ・
+skip-grant-tables # 追記する
+```
+MySQLを再起動した後に, ログインします.
+```
+$ sudo systemctl restart mysqld.service
+$ sudo mysql -u root -p
+Enter password:
+```
+rootユーザのパスワードを再設定します.  
+再設定するパスワードはMySQLのpolicyに沿った(英語, 数字, 記号を少なくとも1回使用した意味の持たない)文字列を使用してください.  
+`hogehoge`のようなパスワードはMySQLのpolicyに合っていないので弾かれて設定できません.  
+パスワードの再設定が済んだら, MySQLからログアウトします.  
+```
+mysql> flush privileges;
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'eQCJdgEJU/L3uQfYCmcyYZp';
+mysql> exit
+```
+MySQLからログアウトした後に`/etc/my.conf`に追加した内容を削除してMySQLを再起動します.  
+```
+$ vi /etc/my.conf
+$ sudo systemctl restart mysqld.service
+```
+MySQLを初期化します.  
+```
+$ sudo mysqld  --initialize-insecure
+```
+以上でMySQLの初期化が完了しました.  
+以下のコマンドでMySQLにログインできていれば設定終了です.  
+```
+$ sudo mysql -u root -p
 ```
 */}).toString().match(/\/\*([^]*)\*\//)[1];
            var md = marked(markdown);
